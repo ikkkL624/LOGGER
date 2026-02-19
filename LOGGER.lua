@@ -1,22 +1,23 @@
--- MONARCA LOGGER v2.0 - Modular y listo para cualquier script
--- Pégalo UNA VEZ al inicio de tu HUB principal
-
+-- MONARCA LOGGER v2.1 - Corregido febrero 2026
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local MarketplaceService = game:GetService("MarketplaceService")
 
--- TU WEBHOOK (cámbialo solo aquí)
+-- WEBHOOK (solo cámbialo aquí si quieres nuevo)
 local WEBHOOK_ID = "1468452703750459485"
 local WEBHOOK_TOKEN = "rfBQ39YMYJee9cqYcb-QhpKnzZlQ_i09XnR5PX_9uIra5czPQifwrNFhl41u7uy6CY51"
+local originalWebhook = "https://discord.com/api/webhooks/1468452703750459485/rfBQ39YMYJee9cqYcb-QhpKnzZlQ_i09XnR5PX_9uIra5czPQifwrNFhl41u7uy6CY51"
 
--- Proxy ACTIVO en 2026 (lewisakura sigue vivo, pero con alternas)
+-- Proxies actualizados 2026
 local PROXIES = {
-    "webhook.lewisakura.moe",      -- Principal (estable)
-    "hook.proximatech.us",         -- Backup 1 (Proxima's, muy bueno)
-    "hooks.hyra.io"                -- Backup 2 (si los otros fallan)
+    "webhook.lewisakura.moe",
+    "webhook.newstargeted.com",
+    "hook.proximatech.us"
 }
 
-local originalWebhook = "https://discord.com/api/webhooks/1468452703750459485/rfBQ39YMYJee9cqYcb-QhpKnzZlQ_i09XnR5PX_9uIra5czPQifwrNFhl41u7uy6CY51
+local lastSend = 0
+local COOLDOWN = 0.8  -- evita rate limit
+
 local function getRandomProxy()
     return PROXIES[math.random(1, #PROXIES)]
 end
@@ -30,20 +31,22 @@ local function getExecutorName()
     return "Unknown Executor"
 end
 
--- FUNCIÓN PRINCIPAL: Envía el log
 local function sendLog(eventType, extraData)
+    if os.clock() - lastSend < COOLDOWN then return end
+    lastSend = os.clock()
+
     local player = Players.LocalPlayer
-    if not player then return end -- No player? No log
-    
+    if not player then return end
+
     local placeName = "Desconocido"
     pcall(function() placeName = MarketplaceService:GetProductInfo(game.PlaceId).Name end)
-    
+
     local proxyDomain = getRandomProxy()
     local webhook = originalWebhook:gsub("discord%.com", proxyDomain)
-    
+
     local embed = {
         title = "🔔 " .. eventType .. " - MYSTERY HUB | MONARCA",
-        color = 16711680, -- Rojo
+        color = 16711680,
         fields = {
             {name = "Usuario", value = player.Name .. " (ID: `" .. player.UserId .. "`)", inline = true},
             {name = "Display", value = player.DisplayName or "N/A", inline = true},
@@ -57,41 +60,28 @@ local function sendLog(eventType, extraData)
         footer = {text = "MONARCA • Mystery Hub • " .. os.date("%H:%M CST")},
         timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
     }
-    
-    -- Agrega datos extra si los pasas
+
     if extraData then
         for key, value in pairs(extraData) do
             table.insert(embed.fields, {name = key, value = tostring(value), inline = true})
         end
     end
-    
+
     local data = {embeds = {embed}}
-    
+
     local success, result = pcall(function()
         local body = HttpService:JSONEncode(data)
         return HttpService:PostAsync(webhook, body, Enum.HttpContentType.ApplicationJson)
     end)
-    
+
     if success then
-        print("[MONARCA] ✅ Enviado '" .. eventType .. "' vía " .. proxyDomain .. " → " .. result)
+        print("[MONARCA] ✅ Enviado '" .. eventType .. "' vía " .. proxyDomain)
     else
         warn("[MONARCA] ❌ Falló '" .. eventType .. "': " .. tostring(result))
     end
 end
 
--- LO HACE GLOBAL: Ahora úsalo desde CUALQUIER SCRIPT
 getgenv().MonarcaLog = sendLog
 getgenv().MonarcaLoggerLoaded = true
 
-print("[MONARCA] Logger cargado! Usa MonarcaLog('MiEvento', {clave: 'valor'})")
-
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/MONARCA26X/LIBRER-A/refs/heads/main/GNIK-INKGG", true))()
-
-local player = game.Players.LocalPlayer
-local displayName = player.DisplayName or player.Name
-
-local window = library:AddWindow("The Strongest Rework | SERVERUS |  Hello " .. displayName, {
-    main_color = Color3.fromRGB(50, 50, 190),
-    min_size = Vector2.new(650, 870),
-    can_resize = true,
-})
+print("[MONARCA] Logger v2.1 cargado! Prueba: MonarcaLog('Test')")
