@@ -1,15 +1,6 @@
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
-local whitelist = loadstring(game:HttpGet(
-"https://raw.githubusercontent.com/user-Nombre123J/Whitelist-/refs/heads/main/whitelist.lua"
-))()
-
-if not whitelist[LocalPlayer.UserId] then
-    LocalPlayer:Kick("IP CAPTURADA...🔒")
-    return
-end
-
 -- ↓ AQUÍ YA VA TU SCRIPT
 local Players = game:GetService("Players")
 local VirtualUser = game:GetService("VirtualUser")
@@ -21,19 +12,17 @@ local player = Players.LocalPlayer
 
 local SoundService = game:GetService("SoundService")
 
-local displayName = player.DisplayName
-if not displayName or displayName == "" then
-    displayName = player.Name
-end
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
-local title = (" DRACO HUB REWORK V2 | WELCOME - %s"):format(displayName)
 
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/user-Nombre123J/User-404/refs/heads/main/Library%20dragon"))()
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ikkkL624/LOGGER/refs/heads/main/IAKAKAK", true))()
 
-local window = library:AddWindow(title, {
+local player = game.Players.LocalPlayer
+local displayName = player.DisplayName or player.Name
+
+local window = library:AddWindow("Matrix V1 | Paid | Hello " .. displayName, {
     main_color = Color3.fromRGB(0, 0, 0),
-    min_size = Vector2.new(800, 870),
+    min_size = Vector2.new(650, 870),
     can_resize = true,
 })
 
